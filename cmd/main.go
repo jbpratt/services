@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/jbpratt78/services"
 )
@@ -22,12 +23,21 @@ func main() {
 	switch *service {
 	case "angelthump":
 		client := services.AngelThumpClient{}
-		err := client.GetChannelByName(*name)
+		res, err := client.GetChannelByName(*name)
+		fmt.Println(res)
+		if err != nil {
+			panic(err)
+		}
+	case "twitch":
+		client := services.TwitchClient{}
+		res, err := client.GetChannelByName(*name)
+		fmt.Println(res)
 		if err != nil {
 			panic(err)
 		}
 
 	default:
+		panic("error: bad service")
 	}
 
 }

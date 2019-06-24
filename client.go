@@ -7,18 +7,26 @@ import (
 )
 
 var serviceURLs = map[string]string{
-	"twitch":     "",
 	"angelthump": "https://api.angelthump.com/v1/",
+	"twitch":     "https://api.twitch.tv/kraken/streams/",
 }
 
 type client interface {
-	GetChannelByName(string) error
+	GetChannelByName(string) (response, error)
 }
 
-type service struct{}
+type response interface {
+	GetLive() bool
+	GetTitle() string
+	GetThumbnail() string
+	GetViewers() int
+}
 
-func (s *service) Get(url string) (*http.Response, error) {
-	req, err := buildRequest("GET", url, nil)
+type service struct {
+}
+
+func (s *service) Get(url string, headers map[string]string) (*http.Response, error) {
+	req, err := buildRequest("GET", url, headers)
 	if err != nil {
 		return nil, err
 	}
