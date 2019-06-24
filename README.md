@@ -1,6 +1,6 @@
 Need support for the following services:
-- [ ] AngelThump
+- [x] AngelThump
 - [ ] Mixer
-- [ ] Twitch
-- [ ] Smashcast
+- [x] Twitch
+- [x] Smashcast
 - [ ] Youtube

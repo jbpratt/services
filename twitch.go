@@ -9,14 +9,6 @@ type TwitchClient struct {
 	ClientID string
 }
 
-type TwitchResponse struct {
-	Username  string `json:"username"`
-	Live      bool   `json:"live"`
-	Title     string `json:"title"`
-	Viewers   int    `json:"viewers"`
-	Thumbnail string `json:"thumbnail"`
-}
-
 type TwitchAPIResponse struct {
 	Stream struct {
 		Viewers    int    `json:"viewers"`
@@ -32,7 +24,7 @@ type TwitchAPIResponse struct {
 }
 
 var _ client = (*TwitchClient)(nil)
-var _ response = (*TwitchResponse)(nil)
+var _ response = (*TwitchAPIResponse)(nil)
 
 func (t *TwitchClient) GetChannelByName(name string) (response, error) {
 
@@ -43,46 +35,32 @@ func (t *TwitchClient) GetChannelByName(name string) (response, error) {
 		return nil, err
 	}
 
-	var intermResp TwitchAPIResponse
+	var r TwitchAPIResponse
 
 	dec := json.NewDecoder(res.Body)
-	err = dec.Decode(&intermResp)
+	err = dec.Decode(&r)
 	if err != nil {
 		return nil, err
 	}
 
-	r := &TwitchResponse{
-		Username:  intermResp.Stream.Channel.DisplayName,
-		Title:     intermResp.Stream.Channel.Status,
-		Viewers:   intermResp.Stream.Viewers,
-		Thumbnail: intermResp.Stream.Preview.Large,
-	}
-
-	r.Live = determineLiveStatus(&intermResp)
-
-	return r, nil
+	return &r, nil
 }
 
-func (r *TwitchResponse) GetLive() bool {
-	return r.Live
-}
-
-func (r *TwitchResponse) GetTitle() string {
-	return r.Title
-}
-
-func (r *TwitchResponse) GetViewers() int {
-	return r.Viewers
-}
-
-func (r *TwitchResponse) GetThumbnail() string {
-	return r.Thumbnail
-}
-
-func determineLiveStatus(res *TwitchAPIResponse) bool {
-	if res.Stream.StreamType == "live" {
+func (r *TwitchAPIResponse) GetLive() bool {
+	if r.Stream.StreamType == "live" {
 		return true
-	} else {
-		return false
 	}
+	return false
+}
+
+func (r *TwitchAPIResponse) GetTitle() string {
+	return r.Stream.Channel.DisplayName
+}
+
+func (r *TwitchAPIResponse) GetViewers() int {
+	return r.Stream.Viewers
+}
+
+func (r *TwitchAPIResponse) GetThumbnail() string {
+	return r.Stream.Preview.Large
 }

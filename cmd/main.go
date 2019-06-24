@@ -35,7 +35,13 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-
+	case "smashcast":
+		client := services.SmashcastClient{}
+		res, err := client.GetChannelByName(*name)
+		fmt.Println(res)
+		if err != nil {
+			panic(err)
+		}
 	default:
 		panic("error: bad service")
 	}

@@ -6,7 +6,7 @@ type AngelThumpClient struct {
 	service
 }
 
-type AngelThumpResponse struct {
+type AngelThumpAPIResponse struct {
 	Username  string `json:"username"`
 	Live      bool   `json:"live"`
 	Title     string `json:"title"`
@@ -15,34 +15,38 @@ type AngelThumpResponse struct {
 }
 
 var _ client = (*AngelThumpClient)(nil)
-var _ response = (*AngelThumpResponse)(nil)
+var _ response = (*AngelThumpAPIResponse)(nil)
 
 func (at *AngelThumpClient) GetChannelByName(name string) (response, error) {
+
 	res, err := at.Get(serviceURLs["angelthump"]+name, nil)
 	if err != nil {
 		return nil, err
 	}
-	var r AngelThumpResponse
+
+	var r AngelThumpAPIResponse
+
 	dec := json.NewDecoder(res.Body)
 	err = dec.Decode(&r)
 	if err != nil {
 		return nil, err
 	}
+
 	return &r, nil
 }
 
-func (r *AngelThumpResponse) GetLive() bool {
+func (r *AngelThumpAPIResponse) GetLive() bool {
 	return r.Live
 }
 
-func (r *AngelThumpResponse) GetTitle() string {
+func (r *AngelThumpAPIResponse) GetTitle() string {
 	return r.Title
 }
 
-func (r *AngelThumpResponse) GetViewers() int {
+func (r *AngelThumpAPIResponse) GetViewers() int {
 	return r.Viewers
 }
 
-func (r *AngelThumpResponse) GetThumbnail() string {
+func (r *AngelThumpAPIResponse) GetThumbnail() string {
 	return r.Thumbnail
 }

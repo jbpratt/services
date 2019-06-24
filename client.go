@@ -8,7 +8,9 @@ import (
 
 var serviceURLs = map[string]string{
 	"angelthump": "https://api.angelthump.com/v1/",
+	"smashcast":  "https://api.smashcast.tv/media/live/",
 	"twitch":     "https://api.twitch.tv/kraken/streams/",
+	"youtube":    "https://www.googleapis.com/youtube/v3/videos",
 }
 
 type client interface {
