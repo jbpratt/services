@@ -56,6 +56,10 @@ func (s *service) do(req *http.Request) (*http.Response, error) {
 		return nil, errors.New("401: access denied")
 	}
 
+	if res.StatusCode == 403 {
+		return nil, errors.New("403: forbidden")
+	}
+
 	if res.StatusCode == 404 {
 		return nil, errors.New("404: not found")
 	}

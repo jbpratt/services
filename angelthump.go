@@ -7,7 +7,6 @@ type AngelThumpClient struct {
 }
 
 type AngelThumpAPIResponse struct {
-	Username  string `json:"username"`
 	Live      bool   `json:"live"`
 	Title     string `json:"title"`
 	Viewers   int    `json:"viewers"`

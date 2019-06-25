@@ -2,7 +2,8 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
+	"net/url"
+	"strconv"
 )
 
 type YoutubeClient struct {
@@ -11,11 +12,22 @@ type YoutubeClient struct {
 }
 
 type YoutubeAPIResponse struct {
-	Username  string `json:"username"`
-	Live      bool   `json:"live"`
-	Title     string `json:"title"`
-	Viewers   int    `json:"viewers"`
-	Thumbnail string `json:"thumbnail"`
+	Items []struct {
+		Snippet struct {
+			Title      string `json:"title"`
+			Thumbnails struct {
+				Medium struct {
+					URL string `json:"url"`
+				} `json:"medium"`
+			} `json:"thumbnails"`
+		} `json:"snippet"`
+		LiveStreamingDetails struct {
+			ConcurrentViewers string `json:"concurrentViewers"`
+		} `json:"liveStreamingDetails"`
+		Statistics struct {
+			ViewCount string `json:"viewCount"`
+		} `json:"statistics"`
+	} `json:"items"`
 }
 
 var _ client = (*YoutubeClient)(nil)
@@ -23,16 +35,22 @@ var _ response = (*YoutubeAPIResponse)(nil)
 
 func (yt *YoutubeClient) GetChannelByName(id string) (response, error) {
 
-	// swapping back to query.Set() after I get this working
-	url := serviceURLs["youtube"] + "?key=" + yt.APIKey +
-		"&part=liveStreamingDetails,snippet,statistics" + "&id=" + id
-
-	fmt.Println(url)
-	res, err := yt.Get(url, nil)
+	u, err := url.Parse(serviceURLs["youtube"])
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(res)
+
+	// params func probably
+	q := u.Query()
+	q.Set("key", yt.APIKey)
+	q.Set("part", "liveStreamingDetails,snippet,statistics")
+	q.Set("id", id)
+	u.RawQuery = q.Encode()
+
+	res, err := yt.Get(u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	var r YoutubeAPIResponse
 
@@ -46,18 +64,25 @@ func (yt *YoutubeClient) GetChannelByName(id string) (response, error) {
 	return &r, nil
 }
 
+// want a better way to determine this
 func (r *YoutubeAPIResponse) GetLive() bool {
-	return r.Live
+	if r.Items[0].LiveStreamingDetails.ConcurrentViewers != "0" {
+		return true
+	}
+	return false
 }
 
 func (r *YoutubeAPIResponse) GetTitle() string {
-	return r.Title
+	return r.Items[0].Snippet.Title
 }
 
+// need way to take into account whether LiveStreamingDetails
+// has been populated or not
 func (r *YoutubeAPIResponse) GetViewers() int {
-	return r.Viewers
+	res, _ := strconv.Atoi(r.Items[0].Statistics.ViewCount)
+	return res
 }
 
 func (r *YoutubeAPIResponse) GetThumbnail() string {
-	return r.Thumbnail
+	return r.Items[0].Snippet.Thumbnails.Medium.URL
 }
