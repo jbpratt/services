@@ -24,24 +24,38 @@ func main() {
 	case "angelthump":
 		client := services.AngelThumpClient{}
 		res, err := client.GetChannelByName(*name)
-		fmt.Println(res)
 		if err != nil {
 			panic(err)
 		}
+		fmt.Println(res)
 	case "twitch":
 		client := services.TwitchClient{}
 		res, err := client.GetChannelByName(*name)
-		fmt.Println(res)
 		if err != nil {
 			panic(err)
 		}
+		fmt.Println(res)
 	case "smashcast":
 		client := services.SmashcastClient{}
 		res, err := client.GetChannelByName(*name)
-		fmt.Println(res)
 		if err != nil {
 			panic(err)
 		}
+		fmt.Println(res)
+	case "mixer":
+		client := services.MixerClient{}
+		res, err := client.GetChannelByName(*name)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(res)
+	case "youtube":
+		client := services.YoutubeClient{}
+		res, err := client.GetChannelByName(*name)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(res)
 	default:
 		panic("error: bad service")
 	}
